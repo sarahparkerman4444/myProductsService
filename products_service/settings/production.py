@@ -22,17 +22,10 @@ except KeyError:
 
 # Security
 # https://docs.djangoproject.com/en/2.0/ref/settings/#allowed-hosts
-"""
 try:
     ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split(',')
 except KeyError:
     ALLOWED_HOSTS = []
-"""
-
-ALLOWED_HOSTS = "*"
-# https://docs.djangoproject.com/en/2.0/ref/settings/#secure-proxy-ssl-header
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # NGINX and HTTPS

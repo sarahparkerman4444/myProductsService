@@ -1,3 +1,5 @@
+# This composition including its keys are used for development purposes only.
+# See the README.md for installation notes.
 version: "3.1"
 
 services:
