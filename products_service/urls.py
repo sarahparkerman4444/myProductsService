@@ -24,12 +24,14 @@ from products import views
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-schema_view = get_schema_view(
-    openapi.Info(
+swagger_info = openapi.Info(
         title="Products Service API",
         default_version='latest',
         description="Test description",
-    ),
+)
+
+schema_view = get_schema_view(
+    swagger_info,
     public=True,
     permission_classes=(permissions.AllowAny,),
 )

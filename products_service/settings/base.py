@@ -177,3 +177,8 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_SECRET')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_SECURE_URLS = True
 AWS_DEFAULT_ACL = None
+
+# Swagger settings - for generate_swagger management command
+SWAGGER_SETTINGS = {
+    'DEFAULT_INFO': 'products_service.urls.swagger_info',
+}
