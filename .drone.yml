@@ -65,7 +65,7 @@ pipeline:
       - cp ../../../../../../swagger.json swagger.json -r
       - cd ../../../../..
       - git add .
-      - git commit -m "Updated documentation for Products service"
+      - git diff-index --quiet HEAD || git commit -m "Updated documentation for Products service"
       - git push origin master
     environment:
       - AWS_ACCESS_KEY_ID=example
