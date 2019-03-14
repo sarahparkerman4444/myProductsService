@@ -58,12 +58,12 @@ pipeline:
       - git config --global user.name "HumanitecBot"
       - git clone git@github.com:Humanitec/docs-site.git
       - mkdir -p docs-site/hugo/content/marketplace/products-module/products-service/
-      - mkdir -p docs-site/hugo/static/marketplace/products-module/products-service/
+      - mkdir -p docs-site/api/marketplace/products-service/
       - cd docs-site/hugo/content/marketplace/products-module/products-service/
       - cp ../../../../../../README.md _index.md -r
-      - cd ../../../../static/marketplace/products-module/products-service/
-      - cp ../../../../../../swagger.json swagger.json -r
-      - cd ../../../../..
+      - cd ../../../../../api/marketplace/products-service
+      - cp ../../../../swagger.json swagger.json -r
+      - cd ../../../
       - git add .
       - git diff-index --quiet HEAD || git commit -m "Updated documentation for Products service"
       - git push origin master
