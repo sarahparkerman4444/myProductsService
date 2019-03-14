@@ -61,9 +61,9 @@ pipeline:
       - mkdir -p docs-site/hugo/static/marketplace/products-module/products-service/
       - cd docs-site/hugo/content/marketplace/products-module/products-service/
       - cp ../../../../../../README.md _index.md -r
-      - cd ../../../../static/marketplace/products-module/products-service/
-      - cp ../../../../../../swagger.json swagger.json -r
-      - cd ../../../../..
+      - cd ../../../../../api/marketplace/products-service
+      - cp ../../../../swagger.json swagger.json -r
+      - cd ../../../
       - git add .
       - git diff-index --quiet HEAD || git commit -m "Updated documentation for Products service"
       - git push origin master
