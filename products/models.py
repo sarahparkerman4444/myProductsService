@@ -11,16 +11,29 @@ def make_filepath(instance, filename):
     return filepath+new_filename
 
 
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=127)
+    organization_uuid = models.UUIDField('Organization UUID')
+    create_date = models.DateTimeField(auto_now_add=True)
+    edit_date = models.DateTimeField(auto_now=True)
+
+
 class Product(models.Model):
     """
     Model for product
     """
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    part_number = models.CharField(max_length=127, blank=True)
+    installation_date = models.DateField(blank=True, null=True)
+    manufacture_date = models.DateField(blank=True, null=True)
+    recurring_check_interval = models.PositiveSmallIntegerField(blank=True, null=True, help_text="Number of months")
+    notes = models.TextField(blank=True)
     workflowlevel2_uuid = models.CharField(max_length=255, verbose_name='WorkflowLevel2 UUID', blank=True, help_text="Unique ID to relate back  to Bifrost workflow")
     name = models.CharField(max_length=255, help_text="Product name")
     make = models.CharField(max_length=255, help_text="Who made the product", blank=True, null=True)
     model = models.CharField(max_length=255, help_text="What is the model from the manufacturer", blank=True, null=True)
-    style = models.CharField(max_length=255, help_text="Distinguishing look or color of  product", blank=True, null=True)
+    style = models.CharField(max_length=255, help_text="Distinguishing look or color of product", blank=True, null=True)
     description = models.CharField(max_length=255, help_text="Detailed info", blank=True, null=True)
     type = models.CharField(max_length=255, blank=True, null=True, help_text="Type of product")
     file = models.FileField(upload_to=make_filepath, null=True, blank=True)
