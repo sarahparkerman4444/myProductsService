@@ -29,3 +29,10 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Property
         fields = '__all__'
+
+
+class ProductCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ProductCategory
+        exclude = ('organization_uuid', )
