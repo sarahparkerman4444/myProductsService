@@ -1,4 +1,7 @@
-from rest_framework import viewsets
+from typing import Any
+
+from rest_framework import viewsets, status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.pagination import CursorPagination, PageNumberPagination
 from rest_framework.decorators import action
@@ -8,6 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import FileResponse
 
+from products.models import ProductCategory
+from products.permissions import OrganizationPermission
 from . import models as rules
 from . import serializer
 
@@ -94,3 +99,19 @@ class PropertyViewSet(viewsets.ModelViewSet):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     queryset = rules.Property.objects.all()
     serializer_class = serializer.PropertySerializer
+
+
+class ProductCategoryViewSet(viewsets.ModelViewSet):
+
+    def create(self, request: Request, *args: Any, **kwargs: Any):
+        """
+        Set the `organization_uuid` from the JWT Payload for permission purposes.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(organization_uuid=request.session['jwt_organization_uuid'])
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    queryset = ProductCategory.objects.all()
+    serializer_class = serializer.ProductCategorySerializer
+    permission_classes = (OrganizationPermission, )
