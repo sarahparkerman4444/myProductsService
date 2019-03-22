@@ -88,3 +88,37 @@ class TestProductModule:
         properties = Product.objects.get(pk=product.pk).property_set.all()
         assert property1 in properties
         assert property2 in properties
+
+    def test_replacement_product_field(self):
+        product1 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 1',
+        )
+        product1.save()
+        product2 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 2',
+        )
+        product2.save()
+        product1.replacement_product = product2
+        product1.save()
+
+        assert product1.replacement_product == product2
+        assert product2.replaced_product == product1
+
+    def test_replaced_product_field(self):
+        product1 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 1',
+        )
+        product1.save()
+        product2 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 2',
+        )
+        product2.save()
+        product2.replaced_product = product1
+        product2.save()
+
+        assert product2.replaced_product == product1
+        assert product1.replacement_product == product2

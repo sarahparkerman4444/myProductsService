@@ -32,6 +32,7 @@ class Product(models.Model):
     manufacture_date = models.DateField(blank=True, null=True)
     recurring_check_interval = models.PositiveSmallIntegerField(blank=True, null=True, help_text="Number of months")
     notes = models.TextField(blank=True)
+    replacement_product = models.OneToOneField('self', blank=True, null=True, related_name='replaced_product', on_delete=models.SET_NULL, help_text="The replacement_product is the new, which replaces the old replaced_product.")
     workflowlevel2_uuid = models.CharField(max_length=255, verbose_name='WorkflowLevel2 UUID', blank=True, help_text="Unique ID to relate back  to Bifrost workflow")
     name = models.CharField(max_length=255, help_text="Product name")
     make = models.CharField(max_length=255, help_text="Who made the product", blank=True, null=True)

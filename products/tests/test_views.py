@@ -76,6 +76,44 @@ class ProductUpdateTest(ProductViewsBaseTest):
                          data['workflowlevel2_uuid'])
         self.assertEqual(product.name, data['name'])
 
+    def test_update_product_replacement(self):
+        product1 = model_factories.ProductFactory.create()
+        product2 = model_factories.ProductFactory.create()
+        data = {
+            'workflowlevel2_uuid': str(uuid.uuid4()),  # changing
+            'name': 'New name',  # changing
+            'make': product1.make,
+            'model': product1.model,
+            'type': product1.type,
+            'status': product1.status,
+            'replacement_product': product2.id,
+        }
+        request = self.factory.put('', data)
+        request.user = self.user
+        response = ProductViewSet.as_view({'put': 'update'})(request, uuid=product1.uuid)
+        self.assertEqual(response.status_code, 200)
+
+        product = Product.objects.get(id=response.data['id'])
+        self.assertEqual(product.workflowlevel2_uuid, data['workflowlevel2_uuid'])
+        self.assertEqual(product.name, data['name'])
+
+        # test replaced_product
+        product3 = model_factories.ProductFactory.create()
+        data = {
+            'name': 'New name',
+            'replaced_product': product3.id,
+        }
+        request = self.factory.put('', data)
+        request.user = self.user
+        response = ProductViewSet.as_view({'put': 'update'})(request,
+                                                             uuid=product1.uuid)
+        self.assertEqual(response.status_code, 200)
+
+        product = Product.objects.get(id=response.data['id'])
+        self.assertEqual(product.replaced_product, product3)
+        product3 = Product.objects.get(id=product3.id)
+        self.assertEqual(product3.replacement_product, product1)
+
     def test_update_product_fail(self):
         product = model_factories.ProductFactory.create()
         data = {
