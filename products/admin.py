@@ -3,9 +3,10 @@ from .models import Product, Property
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'create_date', 'edit_date')
+    list_display = ('name', 'installation_date', 'manufacture_date', 'category', 'create_date', 'edit_date')
     display = 'Product'
     list_filter = ('create_date',)
+    readonly_fields = ('uuid', 'replaced_product', )
     search_fields = ('name',)
 
 
