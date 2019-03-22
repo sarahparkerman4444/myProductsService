@@ -17,6 +17,9 @@ class ProductCategory(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     """
