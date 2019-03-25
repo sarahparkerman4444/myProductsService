@@ -106,7 +106,8 @@ class TestProductModule:
         assert product1.replacement_product == product2
         assert product2.replaced_product == product1
 
-    def test_replaced_product_field(self):
+    def test_replaced_product_field_will_be_unset(self):
+        """Replaced_product-field by direct assignment will persist unset."""
         product1 = Product(
             workflowlevel2_uuid=uuid.uuid4,
             name='Product 1',
@@ -120,5 +121,28 @@ class TestProductModule:
         product2.replaced_product = product1
         product2.save()
 
-        assert product2.replaced_product == product1
-        assert product1.replacement_product == product2
+        product1 = Product.objects.get(uuid=product1.uuid)
+        product2 = Product.objects.get(uuid=product2.uuid)
+
+        assert hasattr(product2, 'replaced_product') is False
+        assert product1.replacement_product is None
+
+    def test_set_replaced_product_field_will_be_unset(self):
+        product1 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 1',
+        )
+        product1.save()
+        product2 = Product(
+            workflowlevel2_uuid=uuid.uuid4,
+            name='Product 2',
+        )
+        product2.save()
+
+        product1.set_replaced_product(product2)
+
+        product1 = Product.objects.get(uuid=product1.uuid)
+        product2 = Product.objects.get(uuid=product2.uuid)
+
+        assert product1.replaced_product == product2
+        assert product2.replacement_product == product1

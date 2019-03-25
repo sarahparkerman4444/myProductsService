@@ -50,6 +50,18 @@ class Product(models.Model):
     def __str__(self):
         return '{} <{}>'.format(self.name, self.type)
 
+    def set_replaced_product(self, replaced_product: models.Model or None) -> models.Model:
+        """The Related Field needs to be set and saved manually through the FK-field on the related Product."""
+        if replaced_product is None:
+            if hasattr(self, 'replaced_product'):
+                replaced_product = self.replaced_product
+                replaced_product.replacement_product = None
+                replaced_product.save()
+        else:
+            replaced_product.replacement_product = self
+            replaced_product.save()
+        return self
+
 
 class Property(models.Model):
     """
