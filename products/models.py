@@ -12,6 +12,7 @@ def make_filepath(instance, filename):
 
 
 class ProductCategory(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=127)
     is_global = models.BooleanField(default=False, help_text="All organizations have access to global categories.")
     organization_uuid = models.UUIDField('Organization UUID')
