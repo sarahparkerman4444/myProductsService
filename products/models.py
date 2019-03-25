@@ -25,7 +25,7 @@ class Product(models.Model):
     """
     Model for product
     """
-    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, blank=True, null=True)
     part_number = models.CharField(max_length=127, blank=True)
     installation_date = models.DateField(blank=True, null=True)

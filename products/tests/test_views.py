@@ -32,7 +32,7 @@ class ProductCreateTest(ProductViewsBaseTest):
         response = ProductViewSet.as_view({'post': 'create'})(request)
         self.assertEqual(response.status_code, 201)
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         self.assertEqual(product.workflowlevel2_uuid,
                          data['workflowlevel2_uuid'])
         self.assertEqual(product.name, data['name'])
@@ -55,7 +55,6 @@ class ProductCreateTest(ProductViewsBaseTest):
 class ProductUpdateTest(ProductViewsBaseTest):
 
     def test_update_product(self):
-
         product = model_factories.ProductFactory.create()
         data = {
             'workflowlevel2_uuid': str(uuid.uuid4()),  # changing
@@ -71,7 +70,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
                                                              uuid=product.uuid)
         self.assertEqual(response.status_code, 200)
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         self.assertEqual(product.workflowlevel2_uuid,
                          data['workflowlevel2_uuid'])
         self.assertEqual(product.name, data['name'])
@@ -86,14 +85,14 @@ class ProductUpdateTest(ProductViewsBaseTest):
             'model': product1.model,
             'type': product1.type,
             'status': product1.status,
-            'replacement_product': product2.id,
+            'replacement_product': product2.uuid,
         }
         request = self.factory.put('', data)
         request.user = self.user
         response = ProductViewSet.as_view({'put': 'update'})(request, uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         self.assertEqual(product.workflowlevel2_uuid, data['workflowlevel2_uuid'])
         self.assertEqual(product.name, data['name'])
 
@@ -101,7 +100,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         product3 = model_factories.ProductFactory.create()
         data = {
             'name': 'New name',
-            'replaced_product': product3.id,
+            'replaced_product': product3.uuid,
         }
         request = self.factory.put('', data)
         request.user = self.user
@@ -109,9 +108,9 @@ class ProductUpdateTest(ProductViewsBaseTest):
                                                              uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         self.assertEqual(product.replaced_product, product3)
-        product3 = Product.objects.get(id=product3.id)
+        product3 = Product.objects.get(uuid=product3.uuid)
         self.assertEqual(product3.replacement_product, product1)
 
     def test_update_product_fail(self):
@@ -191,7 +190,7 @@ class PropertyCreateTest(ProductViewsBaseTest):
         self.assertEqual(prop.name, data['name'])
         self.assertEqual(prop.type, data['type'])
         self.assertEqual(prop.value, data['value'])
-        self.assertEqual(list(prop.product.all()), products)
+        self.assertCountEqual(prop.product.all(), products)
 
     def test_create_property_fail(self):
         data = {
