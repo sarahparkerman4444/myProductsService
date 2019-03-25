@@ -13,6 +13,7 @@ def make_filepath(instance, filename):
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=127)
+    is_global = models.BooleanField(default=False, help_text="All organizations have access to global categories.")
     organization_uuid = models.UUIDField('Organization UUID')
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)

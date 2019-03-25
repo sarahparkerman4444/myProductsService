@@ -320,6 +320,17 @@ class ProductCategoryRetrieveTest(ProductCategoryTest):
 
         self.assertEqual(response.status_code, 403)
 
+    def test_access_global_category(self):
+        product_category = model_factories.ProductCategoryFactory(is_global=True)
+
+        request = self.factory.get('')
+        request.user = self.user
+        request.session = self.session
+
+        view = ProductCategoryViewSet.as_view({'get': 'retrieve'})
+        response = view(request, pk=product_category.pk)
+
+        self.assertEqual(response.status_code, 200)
 
 class ProductCategoryCreateTest(ProductCategoryTest):
 
