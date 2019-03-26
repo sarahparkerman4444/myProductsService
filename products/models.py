@@ -69,8 +69,7 @@ class Property(models.Model):
     """
     Model for product's property
     """
-    # TODO: Think about making PropertyValue model to store property value for
-    #  a certain product
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     product = models.ManyToManyField(Product, blank=True)
     name = models.CharField(max_length=255, help_text="Dynamic Field name for additional meta definition of a product")
     type = models.CharField(max_length=255, blank=True, null=True, help_text="Type of field")

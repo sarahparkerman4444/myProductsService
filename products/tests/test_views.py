@@ -188,11 +188,11 @@ class PropertyListTest(ProductViewsBaseTest):
         self.assertEqual(len(response.data), 3)
 
         for prop_data in response.data:
-            if prop_data['id'] == prop1.pk:
+            if prop_data['uuid'] == prop1.pk:
                 self.assertEqual(prop_data['product'], [])
-            elif prop_data['id'] == prop2.pk:
+            elif prop_data['uuid'] == prop2.pk:
                 self.assertEqual(len(prop_data['product']), 1)
-            elif prop_data['id'] == prop3.pk:
+            elif prop_data['uuid'] == prop3.pk:
                 self.assertEqual(len(prop_data['product']), 2)
 
     def test_property_list_empty(self):
@@ -233,7 +233,7 @@ class PropertyCreateTest(ProductViewsBaseTest):
         response = PropertyViewSet.as_view({'post': 'create'})(request)
         self.assertEqual(response.status_code, 201)
 
-        prop = Property.objects.get(id=response.data['id'])
+        prop = Property.objects.get(pk=response.data['uuid'])
         self.assertEqual(prop.name, data['name'])
         self.assertEqual(prop.type, data['type'])
         self.assertEqual(prop.value, data['value'])
@@ -267,7 +267,7 @@ class PropertyUpdateTest(ProductViewsBaseTest):
                                                               pk=prop.pk)
         self.assertEqual(response.status_code, 200)
 
-        prop_updated = Property.objects.get(id=response.data['id'])
+        prop_updated = Property.objects.get(pk=response.data['uuid'])
         self.assertEqual(prop_updated.value, data['value'])
         self.assertEqual(prop_updated.name, prop.name)
         self.assertEqual(list(prop.product.all()), products[:1])

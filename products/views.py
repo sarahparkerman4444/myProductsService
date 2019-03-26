@@ -68,7 +68,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         return response
 
-    filter_fields = ('type', 'name', 'workflowlevel2_uuid')
+    filter_fields = ('type', 'name', 'workflowlevel2_uuid', 'part_number', )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     queryset = Product.objects.all()
     serializer_class = serializer.ProductSerializer
