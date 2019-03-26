@@ -14,6 +14,10 @@ class ProductViewsBaseTest(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = model_factories.User()
+        self.organization_uuid = str(uuid.uuid4())
+        self.session = {
+            'jwt_organization_uuid': self.organization_uuid,
+        }
 
 
 class ProductCreateTest(ProductViewsBaseTest):
@@ -29,7 +33,8 @@ class ProductCreateTest(ProductViewsBaseTest):
         }
         request = self.factory.post('', data)
         request.user = self.user
-        response = ProductViewSet.as_view({'post': 'create'})(request)
+        response = ProductViewSet.as_view({'post': 'create'})(request).render()
+
         self.assertEqual(response.status_code, 201)
 
         product = Product.objects.get(uuid=response.data['uuid'])
@@ -281,18 +286,7 @@ class PropertyUpdateTest(ProductViewsBaseTest):
         self.assertEqual(response.status_code, 400)
 
 
-class ProductCategoryTest(TestCase):
-
-    def setUp(self):
-        self.factory = APIRequestFactory()
-        self.user = model_factories.User()
-        self.organization_uuid = str(uuid.uuid4())
-        self.session = {
-            'jwt_organization_uuid': self.organization_uuid,
-        }
-
-
-class ProductCategoryRetrieveTest(ProductCategoryTest):
+class ProductCategoryRetrieveTest(ProductViewsBaseTest):
 
     def test_retrieve_product_category(self):
         product_category = model_factories.ProductCategoryFactory(
@@ -332,16 +326,54 @@ class ProductCategoryRetrieveTest(ProductCategoryTest):
 
         self.assertEqual(response.status_code, 200)
 
-class ProductCategoryCreateTest(ProductCategoryTest):
 
-    def test_create_product_category(self):
-        product_category = model_factories.ProductCategoryFactory(
+class ProductCategoryListTest(ProductViewsBaseTest):
+
+    def test_list_org_categories(self):
+        product_category_global = model_factories.ProductCategoryFactory(is_global=True)
+        product_category_org = model_factories.ProductCategoryFactory(
             organization_uuid=self.organization_uuid,
-            name='old-name'
         )
 
-        self.assertEqual(product_category.name, 'old-name')
+        self.assertEqual(ProductCategory.objects.count(), 2)
 
+        request = self.factory.get('')
+        request.user = self.user
+        request.session = self.session
+
+        view = ProductCategoryViewSet.as_view({'get': 'list'})
+        response = view(request).render()
+        content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(content), 1)
+        self.assertEqual(content[0]['uuid'], str(product_category_org.uuid))
+
+    def test_list_filter_global_categories(self):
+        product_category_global = model_factories.ProductCategoryFactory(is_global=True)
+        product_category_org = model_factories.ProductCategoryFactory(
+            organization_uuid=self.organization_uuid,
+        )
+
+        self.assertEqual(ProductCategory.objects.count(), 2)
+        self.assertEqual(ProductCategory.objects.filter(is_global=True).count(), 1)
+
+        request = self.factory.get('?is_global=true')
+        request.user = self.user
+        request.session = self.session
+
+        view = ProductCategoryViewSet.as_view({'get': 'list'})
+        response = view(request).render()
+        content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(content), 1)
+        self.assertEqual(content[0]['uuid'], str(product_category_global.uuid))
+
+
+class ProductCategoryCreateTest(ProductViewsBaseTest):
+
+    def test_create_product_category(self):
         data = {
             'name': 'create-name',
         }
@@ -351,14 +383,13 @@ class ProductCategoryCreateTest(ProductCategoryTest):
         request.session = self.session
 
         view = ProductCategoryViewSet.as_view({'post': 'create'})
-        response = view(request, pk=product_category.pk)
+        response = view(request).render()
 
         self.assertEqual(response.status_code, 201)
-        response.render()
         self.assertEqual(json.loads(response.content)['name'], 'create-name')
 
 
-class ProductCategoryUpdateTest(ProductCategoryTest):
+class ProductCategoryUpdateTest(ProductViewsBaseTest):
 
     def test_update_product_category(self):
         product_category = model_factories.ProductCategoryFactory(
@@ -384,7 +415,7 @@ class ProductCategoryUpdateTest(ProductCategoryTest):
         self.assertEqual(json.loads(response.content)['name'], 'new-name')
 
 
-class ProductCategoryViewsDeleteTest(ProductCategoryTest):
+class ProductCategoryViewsDeleteTest(ProductViewsBaseTest):
 
     def test_delete_product_category(self):
         product_category = model_factories.ProductCategoryFactory(
