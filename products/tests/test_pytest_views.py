@@ -29,7 +29,7 @@ class TestProductsList:
         assert len(response.data) == 3
 
         product_data = response.data[0]
-        assert 'id' in product_data
+        assert 'uuid' in product_data
         assert 'name' in product_data
 
     def test_products_list_with_name_filter(self, api_rf, user, products):
@@ -41,7 +41,7 @@ class TestProductsList:
         assert len(response.data) == 1
 
         product_data = response.data[0]
-        assert 'id' in product_data
+        assert 'uuid' in product_data
         assert 'name' in product_data
         assert 'type' in product_data
         assert product_data['type'] == TEST_TYPE
@@ -56,7 +56,7 @@ class TestProductsList:
         assert len(response.data) == 1
 
         product_data = response.data[0]
-        assert 'id' in product_data
+        assert 'uuid' in product_data
         assert 'name' in product_data
         assert 'workflowlevel2_uuid' in product_data
         assert product_data['workflowlevel2_uuid'] == TEST_WF2
@@ -91,7 +91,7 @@ class TestProductsDetail:
         assert response.status_code == 200
         assert response.data
 
-        assert response.data['id'] == product.pk
+        assert response.data['uuid'] == str(product.pk)
         assert response.data['uuid'] == str(product.uuid)
         assert 'name' in response.data
         assert 'workflowlevel2_uuid' in response.data
@@ -134,7 +134,7 @@ class TestProductsCreate:
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         assert product.file
         assert product.file_name == 'bar.pdf'
         assert response.data['file'] == reverse('product-file',
@@ -154,7 +154,7 @@ class TestProductsCreate:
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         assert product.file
         assert product.file_name == 'foo.pdf'
 
@@ -177,7 +177,7 @@ class TestProductsUpdate:
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
-        product = Product.objects.get(id=response.data['id'])
+        product = Product.objects.get(uuid=response.data['uuid'])
         assert product.file
         assert product.file_name == 'bar.pdf'
         assert response.data['file'] == reverse('product-file',

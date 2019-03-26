@@ -17,18 +17,22 @@ class ProductCategory(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     """
     Model for product
     """
-    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, blank=True, null=True)
     part_number = models.CharField(max_length=127, blank=True)
     installation_date = models.DateField(blank=True, null=True)
     manufacture_date = models.DateField(blank=True, null=True)
     recurring_check_interval = models.PositiveSmallIntegerField(blank=True, null=True, help_text="Number of months")
     notes = models.TextField(blank=True)
+    replacement_product = models.OneToOneField('self', blank=True, null=True, related_name='replaced_product', on_delete=models.SET_NULL, help_text="The replacement_product is the new, which replaces the old replaced_product.")
     workflowlevel2_uuid = models.CharField(max_length=255, verbose_name='WorkflowLevel2 UUID', blank=True, help_text="Unique ID to relate back  to Bifrost workflow")
     name = models.CharField(max_length=255, help_text="Product name")
     make = models.CharField(max_length=255, help_text="Who made the product", blank=True, null=True)
@@ -45,6 +49,18 @@ class Product(models.Model):
 
     def __str__(self):
         return '{} <{}>'.format(self.name, self.type)
+
+    def set_replaced_product(self, replaced_product: models.Model or None) -> models.Model:
+        """The Related Field needs to be set and saved manually through the FK-field on the related Product."""
+        if replaced_product is None:
+            if hasattr(self, 'replaced_product'):
+                replaced_product = self.replaced_product
+                replaced_product.replacement_product = None
+                replaced_product.save()
+        else:
+            replaced_product.replacement_product = self
+            replaced_product.save()
+        return self
 
 
 class Property(models.Model):
