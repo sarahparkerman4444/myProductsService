@@ -46,5 +46,5 @@ class PropertySerializer(serializers.ModelSerializer):
 class ProductCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.ProductCategory
+        model = models.Category
         exclude = ('organization_uuid', )

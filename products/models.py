@@ -11,11 +11,14 @@ def make_filepath(instance, filename):
     return filepath+new_filename
 
 
-class ProductCategory(models.Model):
+class Category(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=127)
+    is_global = models.BooleanField(default=False, help_text="All organizations have access to global categories.")
     organization_uuid = models.UUIDField('Organization UUID')
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
@@ -26,7 +29,7 @@ class Product(models.Model):
     Model for product
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     part_number = models.CharField(max_length=127, blank=True)
     installation_date = models.DateField(blank=True, null=True)
     manufacture_date = models.DateField(blank=True, null=True)
@@ -67,8 +70,7 @@ class Property(models.Model):
     """
     Model for product's property
     """
-    # TODO: Think about making PropertyValue model to store property value for
-    #  a certain product
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     product = models.ManyToManyField(Product, blank=True)
     name = models.CharField(max_length=255, help_text="Dynamic Field name for additional meta definition of a product")
     type = models.CharField(max_length=255, blank=True, null=True, help_text="Type of field")

@@ -23,6 +23,9 @@ class OrganizationPermission(AllowOptionsAuthentication):
         if request.user.is_superuser:
             return True
 
+        if getattr(obj, 'is_global', False):
+            return True
+
         if getattr(request, 'session', None):
             if request.session.get('jwt_organization_uuid') == str(obj.organization_uuid):
                 return True

@@ -19,5 +19,5 @@ class ProductCategorySerializerTest(TestCase):
     def test_productcategoryserializer_keys(self):
         product_category = model_factories.ProductCategoryFactory()
         serializer = ProductCategorySerializer(product_category)
-        keys = ['id', 'name', 'create_date', 'edit_date', ]
+        keys = ['uuid', 'name', 'is_global', 'create_date', 'edit_date', 'parent', ]
         self.assertEqual(list(serializer.data.keys()), keys)

@@ -11,9 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import FileResponse
 
-from products.models import ProductCategory
+from products.models import Category, Property, Product
 from products.permissions import OrganizationPermission
-from . import models as rules
 from . import serializer
 
 
@@ -69,9 +68,9 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         return response
 
-    filter_fields = ('type', 'name', 'workflowlevel2_uuid')
+    filter_fields = ('type', 'name', 'workflowlevel2_uuid', 'part_number', )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    queryset = rules.Product.objects.all()
+    queryset = Product.objects.all()
     serializer_class = serializer.ProductSerializer
     lookup_field = 'uuid'
 
@@ -93,11 +92,21 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
     filter_fields = ('type', 'product__name', 'name')
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    queryset = rules.Property.objects.all()
+    queryset = Property.objects.all()
     serializer_class = serializer.PropertySerializer
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
+
+    def list(self, request: Request, *args: Any, **kwargs: Any):
+        """
+        Return only global OR organization - categories.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        if not request.query_params.get('is_global', 'false').lower() == 'true':
+            queryset = queryset.filter(organization_uuid=request.session['jwt_organization_uuid'])
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request: Request, *args: Any, **kwargs: Any):
         """
@@ -108,6 +117,8 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         serializer.save(organization_uuid=request.session['jwt_organization_uuid'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    queryset = ProductCategory.objects.all()
+    filter_fields = ('is_global', )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    queryset = Category.objects.all()
     serializer_class = serializer.ProductCategorySerializer
     permission_classes = (OrganizationPermission, )
