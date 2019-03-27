@@ -11,7 +11,7 @@ def make_filepath(instance, filename):
     return filepath+new_filename
 
 
-class ProductCategory(models.Model):
+class Category(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=127)
     is_global = models.BooleanField(default=False, help_text="All organizations have access to global categories.")
@@ -28,7 +28,7 @@ class Product(models.Model):
     Model for product
     """
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     part_number = models.CharField(max_length=127, blank=True)
     installation_date = models.DateField(blank=True, null=True)
     manufacture_date = models.DateField(blank=True, null=True)

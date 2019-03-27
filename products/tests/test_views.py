@@ -6,7 +6,7 @@ from rest_framework.test import APIRequestFactory
 
 from . import model_factories
 from ..views import ProductViewSet, PropertyViewSet, ProductCategoryViewSet
-from ..models import Product, Property, ProductCategory
+from ..models import Product, Property, Category
 
 
 class ProductViewsBaseTest(TestCase):
@@ -335,7 +335,7 @@ class ProductCategoryListTest(ProductViewsBaseTest):
             organization_uuid=self.organization_uuid,
         )
 
-        self.assertEqual(ProductCategory.objects.count(), 2)
+        self.assertEqual(Category.objects.count(), 2)
 
         request = self.factory.get('')
         request.user = self.user
@@ -355,8 +355,8 @@ class ProductCategoryListTest(ProductViewsBaseTest):
             organization_uuid=self.organization_uuid,
         )
 
-        self.assertEqual(ProductCategory.objects.count(), 2)
-        self.assertEqual(ProductCategory.objects.filter(is_global=True).count(), 1)
+        self.assertEqual(Category.objects.count(), 2)
+        self.assertEqual(Category.objects.filter(is_global=True).count(), 1)
 
         request = self.factory.get('?is_global=true')
         request.user = self.user
@@ -421,7 +421,7 @@ class ProductCategoryViewsDeleteTest(ProductViewsBaseTest):
         product_category = model_factories.ProductCategoryFactory(
             organization_uuid=self.organization_uuid
         )
-        self.assertEqual(ProductCategory.objects.count(), 1)
+        self.assertEqual(Category.objects.count(), 1)
 
         request = self.factory.delete('')
         request.user = self.user
@@ -431,4 +431,4 @@ class ProductCategoryViewsDeleteTest(ProductViewsBaseTest):
         response = view(request, pk=product_category.pk)
 
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(ProductCategory.objects.count(), 0)
+        self.assertEqual(Category.objects.count(), 0)

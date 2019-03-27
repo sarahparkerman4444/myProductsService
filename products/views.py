@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import FileResponse
 
-from products.models import ProductCategory, Property, Product
+from products.models import Category, Property, Product
 from products.permissions import OrganizationPermission
 from . import serializer
 
@@ -119,6 +119,6 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
 
     filter_fields = ('is_global', )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    queryset = ProductCategory.objects.all()
+    queryset = Category.objects.all()
     serializer_class = serializer.ProductCategorySerializer
     permission_classes = (OrganizationPermission, )

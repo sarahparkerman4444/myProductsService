@@ -1,7 +1,7 @@
 import factory
 from django.contrib.auth.models import User
 
-from ..models import Product, Property, ProductCategory
+from ..models import Product, Property, Category
 
 
 class ProductFactory(factory.DjangoModelFactory):
@@ -49,4 +49,4 @@ class ProductCategoryFactory(factory.DjangoModelFactory):
     organization_uuid = factory.Faker('uuid4')
 
     class Meta:
-        model = ProductCategory
+        model = Category
