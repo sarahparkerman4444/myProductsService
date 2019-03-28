@@ -1,8 +1,13 @@
++++
+title = "Products service (Django)"
+api_url = "marketplace/products-service"
++++
+
 # Products service (Django)
 
 ## Overview
 
-The products service provides the backend for a products and inventory feature for your application. It exposes the **Product** and **Property** data models. These data models have a many-to-many relationship.
+The products service provides the backend for a products and inventory feature for your app. It exposes the **Product** and **Property** data models. These data models have a many-to-many relationship.
 
 ## Data models
 
@@ -33,7 +38,7 @@ Endpoints:
 -  `DELETE /products/{uuid}/`: Deletes the product with the given UUID.
 -  `GET /products/{uuid}/file/`: Retrieves the file attached to the product with the given UUID.
 
-[Click here for the full API documentation.](#point-this-link-to-swagger-docs)
+[Click here for the full API documentation.](https://docs.walhall.io/api/marketplace/products-service)
 
 ### Property
 
@@ -53,11 +58,10 @@ Endpoints:
 -  `PATCH /property/{id}/`: Updates the property with the given ID (only specified fields).
 -  `DELETE /property/{id}/`: Deletes the property with the given ID.
 
-[Click here for the full API documentation.](#point-this-link-to-swagger-docs)
+[Click here for the full API documentation.](https://docs.walhall.io/api/marketplace/products-service)
 
 ## Local development
 
-<!-- Just Django instructions for now -->
 Here are some instructions for developing this service locally:
 
 ### Prerequisites
@@ -104,12 +108,13 @@ To run bash:
 docker-compose run --rm --entrypoint 'bash' {name-of-service}
 ```
 
-## API documentation (Swagger)
+<!-- ## BiFrost API implementation
 
-[Click here to go to the full API documentation.](/{path-to-the-api-docs})
+-  How does this service connect to BiFrost?
+-  How does it use the core data model? -->
 
 ## License
 
 Copyright &#169;2019 Humanitec GmbH.
 
-This code is released under the [Humanitec Affero GPL](LICENSE).
+This code is released under the Humanitec Affero GPL. See the **LICENSE** file for details.
