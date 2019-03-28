@@ -48,3 +48,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Category
         exclude = ('organization_uuid', )
+
+
+class RootCategorySerializer(CategorySerializer):
+    children = CategorySerializer(many=True, read_only=True)

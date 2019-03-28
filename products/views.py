@@ -120,5 +120,5 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     filter_fields = ('is_global', )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     queryset = Category.objects.all()
-    serializer_class = serializer.CategorySerializer
+    serializer_class = serializer.RootCategorySerializer
     permission_classes = (OrganizationPermission, )
