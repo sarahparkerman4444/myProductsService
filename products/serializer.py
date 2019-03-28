@@ -43,7 +43,7 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Category
