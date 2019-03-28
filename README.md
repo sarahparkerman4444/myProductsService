@@ -1,3 +1,8 @@
++++
+title = "Products service (Django)"
+api_url = "marketplace/products-service"
++++
+
 # Products service (Django)
 
 ## Overview
@@ -112,4 +117,4 @@ docker-compose run --rm --entrypoint 'bash' {name-of-service}
 
 Copyright &#169;2019 Humanitec GmbH.
 
-This code is released under the [Humanitec Affero GPL](LICENSE).
+This code is released under the Humanitec Affero GPL. See the **LICENSE** file for details.
