@@ -103,7 +103,7 @@ To run bash:
 docker-compose run --rm --entrypoint 'bash' {name-of-service}
 ```
 
-<!-- ## Connection to BiFrost
+<!-- ## BiFrost API implementation
 
 -  How does this service connect to BiFrost?
 -  How does it use the core data model? -->
