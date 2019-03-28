@@ -43,8 +43,12 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Category
         exclude = ('organization_uuid', )
+
+
+class RootCategorySerializer(CategorySerializer):
+    children = CategorySerializer(many=True, read_only=True)

@@ -18,7 +18,7 @@ class Category(models.Model):
     organization_uuid = models.UUIDField('Organization UUID')
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL, related_name='children')
 
     def __str__(self):
         return self.name
