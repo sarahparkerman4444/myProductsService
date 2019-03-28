@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 
 from . import model_factories
-from ..serializer import ProductCategorySerializer
+from ..serializer import CategorySerializer, RootCategorySerializer
 
 
 class ProductCategorySerializerTest(TestCase):
@@ -16,8 +16,14 @@ class ProductCategorySerializerTest(TestCase):
             'jwt_organization_uuid': self.organization_uuid,
         }
 
-    def test_productcategoryserializer_keys(self):
+    def test_categoryserializer_keys(self):
         product_category = model_factories.ProductCategoryFactory()
-        serializer = ProductCategorySerializer(product_category)
+        serializer = CategorySerializer(product_category)
         keys = ['uuid', 'name', 'is_global', 'create_date', 'edit_date', 'parent', ]
+        self.assertEqual(list(serializer.data.keys()), keys)
+
+    def test_rootcategoryserializer_keys(self):
+        product_category = model_factories.ProductCategoryFactory()
+        serializer = RootCategorySerializer(product_category)
+        keys = ['uuid', 'children', 'name', 'is_global', 'create_date', 'edit_date', 'parent', ]
         self.assertEqual(list(serializer.data.keys()), keys)
