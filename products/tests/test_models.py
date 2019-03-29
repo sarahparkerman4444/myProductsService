@@ -7,6 +7,7 @@ from django.conf import settings
 import boto3
 from moto import mock_s3
 
+from products.tests import model_factories
 from ..models import Product, Property
 
 
@@ -146,3 +147,11 @@ class TestProductModule:
 
         assert product1.replaced_product == product2
         assert product2.replacement_product == product1
+
+    def test_parent_level_category(self):
+        product_category_parent = model_factories.ProductCategoryFactory()
+        product_category_child = model_factories.ProductCategoryFactory(
+            parent=product_category_parent
+        )
+        assert product_category_parent.level == 0
+        assert product_category_child.level == 1

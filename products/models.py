@@ -18,10 +18,16 @@ class Category(models.Model):
     organization_uuid = models.UUIDField('Organization UUID')
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL, related_name='children')
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='children')
+    level = models.PositiveSmallIntegerField(default=0, editable=False, help_text="Resembles the level in the tree.")
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            self.level = self.parent.level + 1
+        super().save(*args, **kwargs)
 
 
 class Product(models.Model):
