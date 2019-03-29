@@ -149,8 +149,8 @@ class TestProductModule:
         assert product2.replacement_product == product1
 
     def test_parent_level_category(self):
-        product_category_parent = model_factories.ProductCategoryFactory()
-        product_category_child = model_factories.ProductCategoryFactory(
+        product_category_parent = model_factories.CategoryFactory()
+        product_category_child = model_factories.CategoryFactory(
             parent=product_category_parent
         )
         assert product_category_parent.level == 0

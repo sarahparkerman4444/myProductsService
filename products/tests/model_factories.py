@@ -45,7 +45,7 @@ class UserFactory(factory.DjangoModelFactory):
     is_active = True
 
 
-class ProductCategoryFactory(factory.DjangoModelFactory):
+class CategoryFactory(factory.DjangoModelFactory):
     organization_uuid = factory.Faker('uuid4')
 
     class Meta:
