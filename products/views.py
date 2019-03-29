@@ -117,7 +117,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         serializer.save(organization_uuid=request.session['jwt_organization_uuid'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    filter_fields = ('is_global', )
+    filter_fields = ('is_global', 'level', )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     queryset = Category.objects.all()
     serializer_class = serializer.RootCategorySerializer
