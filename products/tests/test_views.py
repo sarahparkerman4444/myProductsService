@@ -289,7 +289,7 @@ class PropertyUpdateTest(ProductViewsBaseTest):
 class ProductCategoryRetrieveTest(ProductViewsBaseTest):
 
     def test_retrieve_product_category(self):
-        product_category = model_factories.ProductCategoryFactory(
+        product_category = model_factories.CategoryFactory(
             organization_uuid=self.organization_uuid
         )
 
@@ -303,7 +303,7 @@ class ProductCategoryRetrieveTest(ProductViewsBaseTest):
         self.assertEqual(response.status_code, 200)
 
     def test_retrieve_product_category_permission_failed(self):
-        product_category = model_factories.ProductCategoryFactory()
+        product_category = model_factories.CategoryFactory()
 
         request = self.factory.get('')
         request.user = self.user
@@ -315,7 +315,7 @@ class ProductCategoryRetrieveTest(ProductViewsBaseTest):
         self.assertEqual(response.status_code, 403)
 
     def test_access_global_category(self):
-        product_category = model_factories.ProductCategoryFactory(is_global=True)
+        product_category = model_factories.CategoryFactory(is_global=True)
 
         request = self.factory.get('')
         request.user = self.user
@@ -330,8 +330,8 @@ class ProductCategoryRetrieveTest(ProductViewsBaseTest):
 class ProductCategoryListTest(ProductViewsBaseTest):
 
     def test_list_org_categories(self):
-        product_category_global = model_factories.ProductCategoryFactory(is_global=True)
-        product_category_org = model_factories.ProductCategoryFactory(
+        product_category_global = model_factories.CategoryFactory(is_global=True)
+        product_category_org = model_factories.CategoryFactory(
             organization_uuid=self.organization_uuid,
         )
 
@@ -350,8 +350,8 @@ class ProductCategoryListTest(ProductViewsBaseTest):
         self.assertEqual(content[0]['uuid'], str(product_category_org.uuid))
 
     def test_list_filter_global_categories(self):
-        product_category_global = model_factories.ProductCategoryFactory(is_global=True)
-        product_category_org = model_factories.ProductCategoryFactory(
+        product_category_global = model_factories.CategoryFactory(is_global=True)
+        product_category_org = model_factories.CategoryFactory(
             organization_uuid=self.organization_uuid,
         )
 
@@ -392,7 +392,7 @@ class ProductCategoryCreateTest(ProductViewsBaseTest):
 class ProductCategoryUpdateTest(ProductViewsBaseTest):
 
     def test_update_product_category(self):
-        product_category = model_factories.ProductCategoryFactory(
+        product_category = model_factories.CategoryFactory(
             organization_uuid=self.organization_uuid,
             name='old-name'
         )
@@ -418,7 +418,7 @@ class ProductCategoryUpdateTest(ProductViewsBaseTest):
 class ProductCategoryViewsDeleteTest(ProductViewsBaseTest):
 
     def test_delete_product_category(self):
-        product_category = model_factories.ProductCategoryFactory(
+        product_category = model_factories.CategoryFactory(
             organization_uuid=self.organization_uuid
         )
         self.assertEqual(Category.objects.count(), 1)
