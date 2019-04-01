@@ -156,7 +156,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'products.permissions.AllowOptionsAuthentication',
-    )
+    ),
 }
 
 # JWT Configuration

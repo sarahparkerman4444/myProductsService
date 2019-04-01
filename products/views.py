@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.http import FileResponse
 
 from products.models import Category, Property, Product
+from products.pagination import DefaultLimitOffsetPagination
 from products.permissions import OrganizationPermission
 from . import serializer
 
@@ -32,8 +33,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     def list(self, request):
         # Use this queryset or the django-filters lib will not work
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['GET'])
     def file(self, request, *args, **kwargs):
@@ -54,6 +56,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = serializer.ProductSerializer
     lookup_field = 'uuid'
+    pagination_class = DefaultLimitOffsetPagination
 
 
 class PropertyViewSet(viewsets.ModelViewSet):

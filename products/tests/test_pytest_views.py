@@ -19,16 +19,16 @@ class TestProductsList:
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert response.data == []
+        assert response.data['results'] == []
 
     def test_products_list(self, api_rf, user, products):
         request = api_rf.get(reverse('product-list'))
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert len(response.data) == 3
+        assert len(response.data['results']) == 3
 
-        product_data = response.data[0]
+        product_data = response.data['results'][0]
         assert 'uuid' in product_data
         assert 'name' in product_data
 
@@ -38,9 +38,9 @@ class TestProductsList:
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert len(response.data) == 1
+        assert len(response.data['results']) == 1
 
-        product_data = response.data[0]
+        product_data = response.data['results'][0]
         assert 'uuid' in product_data
         assert 'name' in product_data
         assert 'type' in product_data
@@ -53,9 +53,9 @@ class TestProductsList:
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert len(response.data) == 1
+        assert len(response.data['results']) == 1
 
-        product_data = response.data[0]
+        product_data = response.data['results'][0]
         assert 'uuid' in product_data
         assert 'name' in product_data
         assert 'workflowlevel2_uuid' in product_data
@@ -67,7 +67,7 @@ class TestProductsList:
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert len(response.data) == 0
+        assert len(response.data['results']) == 0
 
         request = api_rf.get('{}?workflowlevel2_uuid={}'.format(
             reverse('product-list'), 'nonexistent')
@@ -75,7 +75,7 @@ class TestProductsList:
         request.user = user
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
-        assert len(response.data) == 0
+        assert len(response.data['results']) == 0
 
 
 @pytest.mark.django_db()
