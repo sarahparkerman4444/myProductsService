@@ -20,6 +20,20 @@ class ProductViewsBaseTest(TestCase):
         }
 
 
+class ProductListTest(ProductViewsBaseTest):
+
+    def test_list_products_pagination_limit(self):
+        model_factories.ProductFactory.create_batch(size=51)
+        request = self.factory.get('')
+        request.user = self.user
+        request.session = self.session
+        view = ProductViewSet.as_view({'get': 'list'})
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 50)
+        self.assertEqual(response.data['next'], 'http://testserver/?limit=50&offset=50')
+
+
 class ProductCreateTest(ProductViewsBaseTest):
 
     def test_create_product(self):
