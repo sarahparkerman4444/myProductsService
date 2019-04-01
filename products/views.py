@@ -3,7 +3,6 @@ from typing import Any
 from rest_framework import viewsets, status
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.pagination import CursorPagination, PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 import django_filters
@@ -14,24 +13,6 @@ from django.http import FileResponse
 from products.models import Category, Property, Product
 from products.permissions import OrganizationPermission
 from . import serializer
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    max_page_size = 1000
-    page_size = 100
-    page_size_query_param = 'page_size'
-
-
-class SmallResultsSetPagination(PageNumberPagination):
-    max_page_size = 50
-    page_size = 20
-    page_size_query_param = 'page_size'
-
-
-class DefaultCursorPagination(CursorPagination):
-    max_page_size = 100
-    page_size = 30
-    page_size_query_param = 'page_size'
 
 
 class ProductViewSet(viewsets.ModelViewSet):
