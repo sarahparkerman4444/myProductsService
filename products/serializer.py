@@ -8,6 +8,20 @@ from . import models
 class ProductSerializer(serializers.ModelSerializer):
     replaced_product = serializers.PrimaryKeyRelatedField(queryset=models.Product.objects.all(), required=False,
                                                           allow_null=True)
+    category_display = serializers.SerializerMethodField(method_name='get_root_category_display')
+    subcategory_display = serializers.SerializerMethodField(method_name='get_level1_category_display')
+
+    def get_root_category_display(self, obj):
+        if obj.category:
+            if getattr(obj.category, 'parent', None):
+                return obj.category.parent.name
+            return obj.category.name
+        return None
+
+    def get_level1_category_display(self, obj):
+        if obj.category and getattr(obj.category, 'parent', None):
+            return obj.category.name
+        return None
 
     def to_representation(self, instance):
         # replace direct file link with file entry point URL
