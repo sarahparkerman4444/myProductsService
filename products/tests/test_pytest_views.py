@@ -61,6 +61,22 @@ class TestProductsList:
         assert 'workflowlevel2_uuid' in product_data
         assert product_data['workflowlevel2_uuid'] == TEST_WF2
 
+    def test_products_list_with_several_wf2_filter(self, api_rf, user, products):
+        test_wf22 = str(uuid.uuid4())
+        model_factories.ProductFactory.create(workflowlevel2_uuid=test_wf22)
+        request = api_rf.get(f'{format(reverse("product-list"))}?workflowlevel2_uuid={TEST_WF2},{test_wf22}')
+        request.user = user
+        response = ProductViewSet.as_view({'get': 'list'})(request)
+        assert response.status_code == 200
+        assert len(response.data['results']) == 2
+
+        product_data = response.data['results'][0]
+        assert 'uuid' in product_data
+        assert 'name' in product_data
+        assert 'workflowlevel2_uuid' in product_data
+        assert product_data['workflowlevel2_uuid'] == TEST_WF2
+        assert response.data['results'][1]['workflowlevel2_uuid'] == test_wf22
+
     def test_products_empty_filter(self, api_rf, user, products):
         request = api_rf.get('{}?type={}'.format(reverse('product-list'),
                                                  'nonexistent'))

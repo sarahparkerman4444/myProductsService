@@ -5,11 +5,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
-import django_filters
+from django_filters import rest_framework as filters
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import FileResponse
 
+from products.filters import ProductFilter
 from products.models import Category, Property, Product
 from products.pagination import DefaultLimitOffsetPagination
 from products.permissions import OrganizationPermission
@@ -51,8 +52,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         return response
 
-    filter_fields = ('type', 'name', 'workflowlevel2_uuid', 'part_number', )
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = ProductFilter
     queryset = Product.objects.all()
     serializer_class = serializer.ProductSerializer
     lookup_field = 'uuid'
@@ -75,7 +76,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     filter_fields = ('type', 'product__name', 'name')
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,)
     queryset = Property.objects.all()
     serializer_class = serializer.PropertySerializer
 
@@ -102,7 +103,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     filter_fields = ('is_global', 'level', )
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,)
     queryset = Category.objects.all()
     serializer_class = serializer.RootCategorySerializer
     permission_classes = (OrganizationPermission, )
