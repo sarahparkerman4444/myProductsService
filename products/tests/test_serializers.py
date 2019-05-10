@@ -57,7 +57,7 @@ class ProductSerializerTest(ProductSerializerBaseTest):
         product_category_parent = model_factories.CategoryFactory(name='test-root')
         product_subcategory = model_factories.CategoryFactory(name='test-subcategory',
                                                               parent=product_category_parent)
-        product = model_factories.Product(category=product_subcategory)
+        product = model_factories.ProductFactory(category=product_subcategory)
         serializer = ProductSerializer(product)
         self.assertEqual(serializer.data['subcategory_display'], product_subcategory.name)
         # test None

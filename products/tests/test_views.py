@@ -23,7 +23,8 @@ class ProductViewsBaseTest(TestCase):
 class ProductListTest(ProductViewsBaseTest):
 
     def test_list_products_pagination_limit(self):
-        model_factories.ProductFactory.create_batch(size=51)
+        model_factories.ProductFactory.create_batch(
+            size=51, organization_uuid=self.organization_uuid)
         request = self.factory.get('')
         request.user = self.user
         request.session = self.session
@@ -32,6 +33,16 @@ class ProductListTest(ProductViewsBaseTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 50)
         self.assertEqual(response.data['next'], 'http://testserver/?limit=50&offset=50')
+
+    def test_fail_read_other_organization_products(self):
+        model_factories.ProductFactory.create()
+        request = self.factory.get('')
+        request.user = self.user
+        request.session = self.session
+        view = ProductViewSet.as_view({'get': 'list'})
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 0)
 
 
 class ProductCreateTest(ProductViewsBaseTest):
@@ -47,7 +58,10 @@ class ProductCreateTest(ProductViewsBaseTest):
         }
         request = self.factory.post('', data)
         request.user = self.user
-        response = ProductViewSet.as_view({'post': 'create'})(request).render()
+        request.session = self.session
+        response = ProductViewSet.as_view(
+            {'post': 'create'}
+        )(request).render()
 
         self.assertEqual(response.status_code, 201)
 
@@ -59,6 +73,7 @@ class ProductCreateTest(ProductViewsBaseTest):
         self.assertEqual(product.type, data['type'])
         self.assertEqual(product.description, data['description'])
         self.assertEqual(product.status, data['status'])
+        self.assertEqual(str(product.organization_uuid), self.organization_uuid)
 
     def test_create_product_fail(self):
         data = {
@@ -67,6 +82,7 @@ class ProductCreateTest(ProductViewsBaseTest):
         }
         request = self.factory.post('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'post': 'create'})(request)
         self.assertEqual(response.status_code, 400)
 
@@ -74,7 +90,9 @@ class ProductCreateTest(ProductViewsBaseTest):
 class ProductUpdateTest(ProductViewsBaseTest):
 
     def test_update_product(self):
-        product = model_factories.ProductFactory.create()
+        product = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid,
+        )
         data = {
             'workflowlevel2_uuid': str(uuid.uuid4()),  # changing
             'name': 'New name',  # changing
@@ -85,6 +103,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request,
                                                              uuid=product.uuid)
         self.assertEqual(response.status_code, 200)
@@ -94,9 +113,21 @@ class ProductUpdateTest(ProductViewsBaseTest):
                          data['workflowlevel2_uuid'])
         self.assertEqual(product.name, data['name'])
 
+    def test_fail_update_other_organization_product(self):
+        product = model_factories.ProductFactory.create()
+        data = {'anything': 'doesn`t matter'}
+        request = self.factory.put('', data)
+        request.user = self.user
+        request.session = self.session
+        response = ProductViewSet.as_view(
+            {'put': 'update'})(request, uuid=product.uuid)
+        self.assertEqual(response.status_code, 404)
+
     def test_update_product_replacement(self):
-        product1 = model_factories.ProductFactory.create()
-        product2 = model_factories.ProductFactory.create()
+        product1 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
+        product2 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
         data = {
             'workflowlevel2_uuid': str(uuid.uuid4()),  # changing
             'name': 'New name',  # changing
@@ -108,6 +139,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request, uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
 
@@ -123,6 +155,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request,
                                                              uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
@@ -133,8 +166,10 @@ class ProductUpdateTest(ProductViewsBaseTest):
         self.assertEqual(product3.replacement_product, product1)
 
     def test_remove_replaced_product(self):
-        product1 = model_factories.ProductFactory.create()
-        product2 = model_factories.ProductFactory.create()
+        product1 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
+        product2 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
         product2.replacement_product = product1
         product2.save()
         product1 = Product.objects.get(uuid=product1.uuid)
@@ -146,6 +181,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request, uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
 
@@ -154,8 +190,10 @@ class ProductUpdateTest(ProductViewsBaseTest):
         self.assertFalse(hasattr(product1, 'replaced_product'))
 
     def test_remove_replacement_product(self):
-        product1 = model_factories.ProductFactory.create()
-        product2 = model_factories.ProductFactory.create()
+        product1 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
+        product2 = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
         product1.replacement_product = product2
         product1.save()
         product1 = Product.objects.get(uuid=product1.uuid)
@@ -167,6 +205,7 @@ class ProductUpdateTest(ProductViewsBaseTest):
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request, uuid=product1.uuid)
         self.assertEqual(response.status_code, 200)
 
@@ -175,15 +214,43 @@ class ProductUpdateTest(ProductViewsBaseTest):
         self.assertIsNone(product1.replacement_product)
 
     def test_update_product_fail(self):
-        product = model_factories.ProductFactory.create()
+        product = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
         data = {
             'name': '',
         }
         request = self.factory.put('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'put': 'update'})(request,
                                                              uuid=product.uuid)
         self.assertEqual(response.status_code, 400)
+
+
+class ProductDeleteTest(ProductViewsBaseTest):
+
+    def test_delete_product(self):
+        product = model_factories.ProductFactory.create(
+            organization_uuid=self.organization_uuid)
+        self.assertEqual(1, Product.objects.count())
+        request = self.factory.delete('')
+        request.user = self.user
+        request.session = self.session
+        response = ProductViewSet.as_view(
+            {'delete': 'destroy'})(request, uuid=product.uuid)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(0, Product.objects.count())
+
+    def test_fail_delete_other_organization_product(self):
+        product = model_factories.ProductFactory.create()
+        self.assertEqual(1, Product.objects.count())
+        request = self.factory.delete('')
+        request.user = self.user
+        request.session = self.session
+        response = ProductViewSet.as_view(
+            {'delete': 'destroy'})(request, uuid=product.uuid)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(1, Product.objects.count())
 
 
 class PropertyListTest(ProductViewsBaseTest):
@@ -260,6 +327,7 @@ class PropertyCreateTest(ProductViewsBaseTest):
         }
         request = self.factory.post('', data)
         request.user = self.user
+        request.session = self.session
         response = ProductViewSet.as_view({'post': 'create'})(request)
         self.assertEqual(response.status_code, 400)
 
