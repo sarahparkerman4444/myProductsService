@@ -6,6 +6,7 @@ from ..models import Product, Property, Category
 
 class ProductFactory(factory.DjangoModelFactory):
     workflowlevel2_uuid = factory.Faker('uuid4')
+    organization_uuid = factory.Faker('uuid4')
     name = factory.Sequence(lambda x: f"Product #{x}")
     make = factory.Faker('company')
     model = factory.Sequence(lambda x: f"Model #{x}")

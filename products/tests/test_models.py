@@ -17,8 +17,9 @@ class TestProductModule:
 
     def test_product_with_required_fields_save(self):
         product = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
+            organization_uuid=uuid.uuid4(),
         )
         product.full_clean()
         product.save()
@@ -29,7 +30,7 @@ class TestProductModule:
 
     def test_product_with_all_fields_save(self):
         product = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
             make='Producer 1',
             model='Model 1',
@@ -37,7 +38,8 @@ class TestProductModule:
             description='Foo bar foo bar',
             type='type',
             status='in-stock',
-            reference_id='UYT1'
+            reference_id='UYT1',
+            organization_uuid=uuid.uuid4(),
         )
         product.full_clean()
         product.save()
@@ -51,10 +53,11 @@ class TestProductModule:
         conn.create_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
         file_mock = SimpleUploadedFile('test1.pdf', b'some content')
         product = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
             file=file_mock,
             file_name='foo.pdf',
+            organization_uuid=uuid.uuid4(),
         )
         product.full_clean()
         product.save()
@@ -67,15 +70,17 @@ class TestProductModule:
 
     def test_product_validation_failed(self):
         product = Product(
-            workflowlevel2_uuid=uuid.uuid4
+            workflowlevel2_uuid=uuid.uuid4(),
+            organization_uuid=uuid.uuid4(),
         )
         with pytest.raises(ValidationError):
             product.full_clean()
 
     def test_product_properties_creation(self):
         product = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
+            organization_uuid=uuid.uuid4(),
         )
         product.save()
         property1 = Property.objects.create(name='Color', value='blue')
@@ -92,13 +97,15 @@ class TestProductModule:
 
     def test_replacement_product_field(self):
         product1 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
+            organization_uuid=uuid.uuid4(),
         )
         product1.save()
         product2 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 2',
+            organization_uuid=uuid.uuid4(),
         )
         product2.save()
         product1.replacement_product = product2
@@ -110,13 +117,15 @@ class TestProductModule:
     def test_replaced_product_field_will_be_unset(self):
         """Replaced_product-field by direct assignment will persist unset."""
         product1 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
+            organization_uuid=uuid.uuid4(),
         )
         product1.save()
         product2 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 2',
+            organization_uuid=uuid.uuid4(),
         )
         product2.save()
         product2.replaced_product = product1
@@ -130,13 +139,15 @@ class TestProductModule:
 
     def test_set_replaced_product_field_will_be_unset(self):
         product1 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 1',
+            organization_uuid=uuid.uuid4(),
         )
         product1.save()
         product2 = Product(
-            workflowlevel2_uuid=uuid.uuid4,
+            workflowlevel2_uuid=uuid.uuid4(),
             name='Product 2',
+            organization_uuid=uuid.uuid4(),
         )
         product2.save()
 

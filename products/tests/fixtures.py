@@ -10,6 +10,7 @@ from . import model_factories
 
 TEST_TYPE = 'test type'
 TEST_WF2 = str(uuid.uuid4())
+TEST_ORGANIZATION = str(uuid.uuid4())
 
 
 @pytest.fixture
@@ -20,9 +21,17 @@ def user():
 @pytest.fixture
 def products():
     return [
-        model_factories.ProductFactory.create(),
-        model_factories.ProductFactory.create(type=TEST_TYPE),
-        model_factories.ProductFactory.create(workflowlevel2_uuid=TEST_WF2),
+        model_factories.ProductFactory.create(
+            organization_uuid=TEST_ORGANIZATION,
+        ),
+        model_factories.ProductFactory.create(
+            type=TEST_TYPE,
+            organization_uuid=TEST_ORGANIZATION,
+        ),
+        model_factories.ProductFactory.create(
+            workflowlevel2_uuid=TEST_WF2,
+            organization_uuid=TEST_ORGANIZATION,
+        ),
     ]
 
 
@@ -34,4 +43,5 @@ def product_with_file():
     return model_factories.ProductFactory.create(
         file=SimpleUploadedFile('foo.pdf', b'some content'),
         file_name='bar.pdf',
+        organization_uuid=TEST_ORGANIZATION,
     )

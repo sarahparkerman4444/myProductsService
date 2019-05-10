@@ -8,15 +8,23 @@ from moto import mock_s3
 from . import model_factories
 from ..views import ProductViewSet
 from ..models import Product
-from .fixtures import user, products, product_with_file, TEST_TYPE, TEST_WF2
+from .fixtures import user, products, product_with_file, TEST_TYPE, TEST_WF2, TEST_ORGANIZATION
 
 
 @pytest.mark.django_db()
-class TestProductsList:
+class TestProductsBase(object):
+    organization_uuid = TEST_ORGANIZATION
+    session = {
+        'jwt_organization_uuid': organization_uuid,
+    }
+
+
+class TestProductsList(TestProductsBase):
 
     def test_products_list_empty(self, api_rf, user):
         request = api_rf.get(reverse('product-list'))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert response.data['results'] == []
@@ -24,6 +32,7 @@ class TestProductsList:
     def test_products_list(self, api_rf, user, products):
         request = api_rf.get(reverse('product-list'))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 3
@@ -36,6 +45,7 @@ class TestProductsList:
         request = api_rf.get('{}?type={}'.format(reverse('product-list'),
                                                  TEST_TYPE))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 1
@@ -51,6 +61,7 @@ class TestProductsList:
             reverse('product-list'), TEST_WF2)
         )
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 1
@@ -63,9 +74,13 @@ class TestProductsList:
 
     def test_products_list_with_several_wf2_filter(self, api_rf, user, products):
         test_wf22 = str(uuid.uuid4())
-        model_factories.ProductFactory.create(workflowlevel2_uuid=test_wf22)
+        model_factories.ProductFactory.create(
+            workflowlevel2_uuid=test_wf22,
+            organization_uuid=TEST_ORGANIZATION,
+        )
         request = api_rf.get(f'{format(reverse("product-list"))}?workflowlevel2_uuid={TEST_WF2},{test_wf22}')
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 2
@@ -74,13 +89,15 @@ class TestProductsList:
         assert 'uuid' in product_data
         assert 'name' in product_data
         assert 'workflowlevel2_uuid' in product_data
-        assert product_data['workflowlevel2_uuid'] == TEST_WF2
-        assert response.data['results'][1]['workflowlevel2_uuid'] == test_wf22
+        assert product_data['workflowlevel2_uuid'] in (TEST_WF2, test_wf22)
+        assert response.data['results'][1]['workflowlevel2_uuid'] in (TEST_WF2, test_wf22)
+        assert response.data['results'][1]['workflowlevel2_uuid'] != response.data['results'][0]['workflowlevel2_uuid']
 
     def test_products_empty_filter(self, api_rf, user, products):
         request = api_rf.get('{}?type={}'.format(reverse('product-list'),
                                                  'nonexistent'))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 0
@@ -89,20 +106,23 @@ class TestProductsList:
             reverse('product-list'), 'nonexistent')
         )
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'list'})(request)
         assert response.status_code == 200
         assert len(response.data['results']) == 0
 
 
-@pytest.mark.django_db()
-class TestProductsDetail:
+class TestProductsDetail(TestProductsBase):
 
     def test_product_detail(self, api_rf, user):
-        product = model_factories.ProductFactory.create()
+        product = model_factories.ProductFactory.create(
+            organization_uuid=TEST_ORGANIZATION
+        )
 
         request = api_rf.get(reverse('product-detail',
                                      args=(product.uuid,)))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'retrieve'})(request,  uuid=str(product.uuid))  # noqa
         assert response.status_code == 200
         assert response.data
@@ -115,6 +135,7 @@ class TestProductsDetail:
     def test_nonexistent_product(self, api_rf, user):
         request = api_rf.get(reverse('product-detail', args=(222,)))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'retrieve'})(request, uuid='e70d4613-2055-4c95-9815-ea2f07210d55')  # noqa
         assert response.status_code == 404
 
@@ -122,6 +143,7 @@ class TestProductsDetail:
         request = api_rf.get(reverse('product-detail',
                                      args=(product_with_file.uuid,)))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'retrieve'})(
             request,  uuid=str(product_with_file.uuid)
         )
@@ -133,8 +155,7 @@ class TestProductsDetail:
 
 
 @mock_s3
-@pytest.mark.django_db()
-class TestProductsCreate:
+class TestProductsCreate(TestProductsBase):
 
     def test_create_product_with_file(self, api_rf, user, s3_conn):
         file_mock = SimpleUploadedFile('foo.pdf', b'some content',
@@ -147,6 +168,7 @@ class TestProductsCreate:
         }
         request = api_rf.post(reverse('product-list'), data)
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
@@ -167,6 +189,7 @@ class TestProductsCreate:
         }
         request = api_rf.post(reverse('product-list'), data)
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
@@ -176,8 +199,7 @@ class TestProductsCreate:
 
 
 @mock_s3
-@pytest.mark.django_db()
-class TestProductsUpdate:
+class TestProductsUpdate(TestProductsBase):
 
     def test_create_product_with_file(self, api_rf, user, s3_conn):
         file_mock = SimpleUploadedFile('foo.pdf', b'some content',
@@ -190,6 +212,7 @@ class TestProductsUpdate:
         }
         request = api_rf.post(reverse('product-list'), data)
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'post': 'create'})(request)
         assert response.status_code == 201
 
@@ -201,13 +224,13 @@ class TestProductsUpdate:
 
 
 @mock_s3
-@pytest.mark.django_db()
-class TestProductFile:
+class TestProductFile(TestProductsBase):
 
     def test_product_file(self, api_rf, user, product_with_file):
         request = api_rf.get(reverse('product-file',
                                      args=(product_with_file.uuid,)))
         request.user = user
+        request.session = self.session
         response = ProductViewSet.as_view({'get': 'file'})(
             request, uuid=product_with_file.uuid
         )
