@@ -53,6 +53,7 @@ class Product(models.Model):
     file_name = models.CharField(max_length=50, null=True, blank=True, help_text='Filename')
     status = models.CharField(max_length=255, blank=True, null=True, help_text="Status of Product (in-stock, on back order etc.) ")
     reference_id = models.CharField("Product identifier", max_length=255, blank=True, null=True, help_text="Unique ID for external tracking or thrid part data system")
+    organization_uuid = models.UUIDField('Organization UUID', db_index=True, help_text='UUID of the organization that has access to the Product')
     create_date = models.DateTimeField(auto_now_add=True)
     edit_date = models.DateTimeField(auto_now=True)
 
