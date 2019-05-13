@@ -48,6 +48,9 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Product
         fields = '__all__'
+        read_only_fields = (
+            'organization_uuid',
+        )
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -61,7 +64,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Category
-        exclude = ('organization_uuid', )
+        exclude = (
+            'organization_uuid',
+        )
 
 
 class RootCategorySerializer(CategorySerializer):
