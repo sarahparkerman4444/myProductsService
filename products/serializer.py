@@ -6,6 +6,7 @@ from . import models
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source='uuid', read_only=True)
     replaced_product = serializers.PrimaryKeyRelatedField(queryset=models.Product.objects.all(), required=False,
                                                           allow_null=True)
     category_display = serializers.SerializerMethodField(method_name='get_root_category_display')
@@ -54,6 +55,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source='uuid', read_only=True)
 
     class Meta:
         model = models.Property
@@ -61,6 +63,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source='uuid', read_only=True)
 
     class Meta:
         model = models.Category
