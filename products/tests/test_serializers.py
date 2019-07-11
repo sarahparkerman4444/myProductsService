@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 
 from . import model_factories
-from ..serializer import CategorySerializer, RootCategorySerializer, ProductSerializer
+from ..serializer import CategorySerializer, RootCategorySerializer, ProductSerializer, PropertySerializer
 
 
 class ProductSerializerBaseTest(TestCase):
@@ -23,14 +23,14 @@ class ProductCategorySerializerTest(ProductSerializerBaseTest):
     def test_categoryserializer_keys(self):
         product_category = model_factories.CategoryFactory()
         serializer = CategorySerializer(product_category)
-        keys = ['uuid', 'name', 'is_global', 'create_date', 'edit_date', 'level', 'parent', ]
-        self.assertEqual(list(serializer.data.keys()), keys)
+        keys = ['id', 'uuid', 'name', 'is_global', 'create_date', 'edit_date', 'level', 'parent', ]
+        self.assertEqual(set(serializer.data.keys()), set(keys))
 
     def test_rootcategoryserializer_keys(self):
         product_category = model_factories.CategoryFactory()
         serializer = RootCategorySerializer(product_category)
-        keys = ['uuid', 'children', 'name', 'is_global', 'create_date', 'edit_date', 'level', 'parent', ]
-        self.assertEqual(list(serializer.data.keys()), keys)
+        keys = ['id', 'uuid', 'children', 'name', 'is_global', 'create_date', 'edit_date', 'level', 'parent', ]
+        self.assertEqual(set(serializer.data.keys()), set(keys))
 
 
 class ProductSerializerTest(ProductSerializerBaseTest):
@@ -65,3 +65,52 @@ class ProductSerializerTest(ProductSerializerBaseTest):
         product.save()
         serializer = ProductSerializer(product)
         self.assertEqual(serializer.data['subcategory_display'], None)
+
+    def test_product_serializer(self):
+        product = model_factories.Product()
+        serializer = ProductSerializer(product)
+        keys = ["id",
+                "uuid",
+                "replaced_product",
+                "category_display",
+                "subcategory_display",
+                "part_number",
+                "installation_date",
+                "manufacture_date",
+                "recurring_check_interval",
+                "notes",
+                "workflowlevel2_uuid",
+                "name",
+                "make",
+                "model",
+                "style",
+                "description",
+                "type",
+                "file",
+                "file_name",
+                "status",
+                "reference_id",
+                "organization_uuid",
+                "create_date",
+                "edit_date",
+                "category",
+                "replacement_product",
+            ]
+        self.assertEqual(set(serializer.data.keys()), set(keys))
+
+
+class PropertySerializerTest(TestCase):
+
+    def test_property_serializer(self):
+        product_property = model_factories.Property()
+        serializer = PropertySerializer(product_property)
+        keys = ["id",
+                "uuid",
+                "product",
+                "name",
+                "value",
+                "type",
+                "create_date",
+                "edit_date",
+            ]
+        self.assertEqual(set(serializer.data.keys()), set(keys))
